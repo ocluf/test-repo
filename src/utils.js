@@ -1,6 +1,8 @@
 /**
- * Utility functions
+ * Enhanced utility functions
  */
+
+const crypto = require('crypto');
 
 /**
  * Format date to YYYY-MM-DD
@@ -12,6 +14,19 @@ function formatDate(date) {
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
+}
+
+/**
+ * Format date and time to YYYY-MM-DD HH:MM:SS
+ * @param {Date} date - Date to format
+ * @returns {string} Formatted date and time
+ */
+function formatDateTime(date) {
+  const formattedDate = formatDate(date);
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  return `${formattedDate} ${hours}:${minutes}:${seconds}`;
 }
 
 /**
@@ -43,8 +58,62 @@ function generateId(length = 10) {
   return result;
 }
 
+/**
+ * Generate secure random token
+ * @param {number} bytes - Number of bytes
+ * @returns {string} Hex encoded random token
+ */
+function generateToken(bytes = 32) {
+  return crypto.randomBytes(bytes).toString('hex');
+}
+
+/**
+ * Hash password with SHA-256
+ * @param {string} password - Password to hash
+ * @param {string} salt - Salt for hashing
+ * @returns {string} Hashed password
+ */
+function hashPassword(password, salt) {
+  return crypto
+    .createHmac('sha256', salt)
+    .update(password)
+    .digest('hex');
+}
+
+/**
+ * Validate email format
+ * @param {string} email - Email to validate
+ * @returns {boolean} True if valid, false otherwise
+ */
+function isValidEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+/**
+ * Slugify a string
+ * @param {string} text - Text to slugify
+ * @returns {string} Slugified text
+ */
+function slugify(text) {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')     // Replace spaces with -
+    .replace(/[^\w\-]+/g, '') // Remove non-word characters
+    .replace(/\-\-+/g, '-')   // Replace multiple - with single -
+    .replace(/^-+/, '')       // Trim - from start
+    .replace(/-+$/, '');      // Trim - from end
+}
+
 module.exports = {
   formatDate,
+  formatDateTime,
   calculateAge,
-  generateId
+  generateId,
+  generateToken,
+  hashPassword,
+  isValidEmail,
+  slugify
 };
